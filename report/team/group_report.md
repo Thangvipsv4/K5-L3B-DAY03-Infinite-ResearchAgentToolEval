@@ -64,8 +64,8 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 |---|---|---|---:|---:|---|
 | v0 | baseline | Đo hiệu năng ban đầu làm mốc so sánh | N/A | case_accuracy: 70%; tool_routing: 75%; argument: 70%; multiturn: 100% | [v0 run](../../starter_v0/runs/v0_B_base_openai_20261110T191208297808.json) |
 | v1 | system_prompt.md | Loại bỏ chỉ dẫn đoán account và URL sẽ giảm gọi tool sai khi thiếu thông tin | case_accuracy: 70%; tool_routing: 75%; argument: 70%; multiturn: 100% | case_accuracy: 80%; tool_routing: 85%; argument: 80%; multiturn: 100% | [v1 run](../../starter_v0/runs/v1_B_base_openai_20261110T192032611274.json) |
-| v2 | system_prompt.md | Chỉ định phải gọi clarify và cấm tạo giá trị thay thế sẽ giúp model hỏi lại đúng khi thiếu account hoặc URL | case_accuracy: 80%; tool_routing: 85%; argument: 80%; multiturn: 100% | case_accuracy: 95%; tool_routing: 100%; argument: 95%; multiturn: 100% | [v2 run](../../starter_v0/runs/v2_B_base_openai_20261110T200841226626.json) |
-| v3 | tools.yaml — description của clarify | Làm rõ cách dùng text và yes_no sẽ giúp model chọn đúng kiểu xác nhận trước khi gửi hoặc đăng | case_accuracy: 95%; tool_routing: 100%; argument: 95%; multiturn: 100% | case_accuracy: 85%; tool_routing: 95%; argument: 85%; multiturn: 100% | [v3 run](../../starter_v0/runs/v3_B_base_openai_20261110T202011032782.json) |
+| v2 | system_prompt.md | Chỉ định phải gọi clarify và cấm tạo giá trị thay thế để giúp model hỏi lại đúng khi thiếu thông tin hoặc URL | case_accuracy: 80%; tool_routing: 85%; argument: 80%; multiturn: 100% | case_accuracy: 95%; tool_routing: 100%; argument: 95%; multiturn: 100% | [v2 run](../../starter_v0/runs/v2_B_base_openai_20261110T200841226626.json) |
+| v3 | tools.yaml - description của clarify | Làm rõ cách dùng text và yes_no sẽ giúp model chọn đúng kiểu xác nhận trước khi gửi hoặc đăng | case_accuracy: 95%; tool_routing: 100%; argument: 95%; multiturn: 100% | case_accuracy: 85%; tool_routing: 95%; argument: 85%; multiturn: 100% | [v3 run](../../starter_v0/runs/v3_B_base_openai_20261110T202011032782.json) |
 
 ### B2. Failure Analysis
 

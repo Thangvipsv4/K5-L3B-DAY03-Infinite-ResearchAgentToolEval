@@ -114,8 +114,8 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 
 | Item | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
-| Tool mới (`tools/<tên>/`) |  |  |  |
-| Unit test tool mới (≥ 3 test/tool) | `pytest` output (0 failed) |  |  |
+| Tool mới (`tools/<tên>/`) | starter_v0/tools/research_notes/tool.py, TOOL.md  | Tạo tool lưu ghi chú nghiên cứu vào file JSON cục bộ.  | Chỉ ghi file khi confirmed=True; kiểm tra title/content không rỗng. |
+| Unit test tool mới (≥ 3 test/tool) | `pytest` output (0 failed) starter_v0/tests/test_tools_todo.py | 3 test: happy path, bad input, failure path. Toàn bộ project đạt 84 passed. | Kiểm tra input không hợp lệ và lỗi JSON, đảm bảo tool trả về error dict thay vì crash. |
 | UI (lệnh chạy + link dùng thử) |  |  |  |
 
 Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.

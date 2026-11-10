@@ -64,31 +64,29 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 |---|---|---|---:|---:|---|
 | v0 | baseline | Đo hiệu năng ban đầu làm mốc so sánh | N/A | case_accuracy: 70%; tool_routing: 75%; argument: 70%; multiturn: 100% | [v0 run](../../starter_v0/runs/v0_B_base_openai_20261110T191208297808.json) |
 | v1 | system_prompt.md | Loại bỏ chỉ dẫn đoán account và URL sẽ giảm gọi tool sai khi thiếu thông tin | case_accuracy: 70%; tool_routing: 75%; argument: 70%; multiturn: 100% | case_accuracy: 80%; tool_routing: 85%; argument: 80%; multiturn: 100% | [v1 run](../../starter_v0/runs/v1_B_base_openai_20261110T192032611274.json) |
-| v2 |  |  |  |  |  |
-| v3 |  |  |  |  |  |
+| v2 | system_prompt.md | Chỉ định phải gọi clarify và cấm tạo giá trị thay thế sẽ giúp model hỏi lại đúng khi thiếu account hoặc URL | case_accuracy: 80%; tool_routing: 85%; argument: 80%; multiturn: 100% | case_accuracy: 95%; tool_routing: 100%; argument: 95%; multiturn: 100% | [v2 run](../../starter_v0/runs/v2_B_base_openai_20261110T200841226626.json) |
+| v3 | tools.yaml — description của clarify | Làm rõ cách dùng text và yes_no sẽ giúp model chọn đúng kiểu xác nhận trước khi gửi hoặc đăng | case_accuracy: 95%; tool_routing: 100%; argument: 95%; multiturn: 100% | case_accuracy: 85%; tool_routing: 95%; argument: 85%; multiturn: 100% | [v3 run](../../starter_v0/runs/v3_B_base_openai_20261110T202011032782.json) |
 
 ### B2. Failure Analysis
 
-Lấy từ `results[*].result.failures` trong run JSON.
+Phân tích đầy đủ các case FAIL trong các run OpenAI v0–v3 được dẫn ở B1. Actual Tool Calls ghi các arguments liên quan đến lỗi; nội dung dài được rút gọn. Failure Type là nhãn của case, còn What Failed mô tả mismatch thực tế. Fix phân biệt thay đổi đã đo và đề xuất chưa kiểm chứng.
 
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
-|R03_web_news_routing  |wrong_tool  |lookup(AI news, news, day, 5)  |"query: expected 'AI', got 'AI news'"  |  |
-|R08_out_of_scope  |out_of_scope  |send(Nguyên hàm ...)  |  "expected no tool call" |  |
-|R10_missing_handle  |missing_info  |timeline(sama)  |"missing tool call clarify","extra tool call timeline"  |  |
-|R11_missing_url  |missing_info  |fetch(https://example.com/article)  |    "missing tool call clarify", "extra tool call fetch"  |
-|R12_confirm_before_send  |wrong_boundary  |send(Bản tin này đã được đăng lên Telegram)  | "missing tool call clarify", "extra tool call send"  |  |
-|R13_parallel_web_and_tweets  |wrong_tool  |social_search(AI, Lastest, 5)  |"query: expected 'AI', got 'AI news'",  "topic: expected 'news', got None"  |  |
-|R14_out_of_scope_coding  |out_of_scope  |send(def fibonacci()...)  |"expected no tool call"  |  |
-|  |  |  |  |  |
-|  |  |  |  |  |
-|  |  |  |  |  |
-|  |  |  |  |  |
-|  |  |  |  |  |
-|  |  |  |  |  |
-
-
-
+| R08_out_of_scope (v0) | out_of_scope | `send(text="Nguyên hàm...")` | Expected no tool call nhưng model dùng send để trả lời bài toán. Đây là gọi tool sai, không chứng minh đã gửi thành công. | Đề xuất: trả lời/định hướng ngoài phạm vi bằng text; không dùng send để trả lời thông thường. Case PASS ở v1–v3, nhưng chưa đủ bằng chứng quy cải thiện cho một rule riêng. |
+| R10_missing_handle (v0) | missing_info | `timeline(screenname="sama", limit=5)` | Tự chọn tài khoản khi user chưa cung cấp; thiếu clarify và gọi thừa timeline. | V1 bỏ chỉ dẫn đoán nhưng case vẫn FAIL. V2 yêu cầu gọi clarify và cấm placeholder; case PASS ở v2 và v3. |
+| R11_missing_url (v0) | missing_info | `fetch(url="https://example.com/article")` | Tự tạo URL thay vì gọi clarify để xin link. | V2 bổ sung rule clarify và cấm URL giả; case PASS ở v2 nhưng tái lỗi ở v3. Cần kiểm chứng lại tính ổn định. |
+| R12_confirm_before_send (v0) | wrong_boundary | `send(text="Bản tin này")` | Gọi send khi chưa xác nhận; expected clarify với response_type=yes_no. | V2 chuyển sang clarify nhưng sai response_type. V3 sửa description vẫn chưa PASS. Đề xuất bỏ chỉ dẫn gửi ngay trong system prompt. |
+| R13_parallel_web_and_tweets (v0) | wrong_tool | `lookup(query="AI news", timeframe="day", max_results=5)`; `social_search(query="AI", search_type="Latest", limit=5)` | Đã chọn đủ hai tool nhưng lookup sai query so với expected AI và thiếu topic=news; mismatch thực tế là arguments. | Đề xuất làm rõ convention query và topic của lookup. Case PASS ở v2 nhưng FAIL lại ở v3; chưa có thay đổi riêng cho lookup được kiểm chứng. |
+| R14_out_of_scope_coding (v0) | out_of_scope | `send(text="Dưới đây là một hàm Python...")` | Expected no tool call nhưng model gọi send để trả lời yêu cầu coding. | Đề xuất giới hạn send cho yêu cầu gửi đã xác nhận. Case PASS ở v1–v3; không kết luận nguyên nhân chỉ từ thay đổi điểm. |
+| R10_missing_handle (v1) | missing_info | `timeline(screenname="your_twitter_handle", limit=5)` | Dùng placeholder thay vì hỏi account qua clarify. | Đã bổ sung rule gọi clarify và cấm placeholder ở v2; case PASS ở v2 và v3. |
+| R11_missing_url (v1) | missing_info | `fetch(url="https://example.com")` | Vẫn tự tạo URL; thiếu clarify và gọi thừa fetch. | Đã sửa rule ở v2; PASS ở v2 nhưng tái lỗi v3. Đề xuất kiểm tra lại trên nhiều run trước khi kết luận ổn định. |
+| R12_confirm_before_send (v1) | wrong_boundary | `send(text="Bản tin này")` | Chưa hỏi xác nhận qua clarify trước khi gọi send. | V3 làm rõ description của clarify nhưng case vẫn FAIL. Đề xuất xử lý chỉ dẫn gửi ngay còn mâu thuẫn trong prompt. |
+| R13_parallel_web_and_tweets (v1) | wrong_tool | `lookup(query="AI", timeframe="day", max_results=5)`; `social_search(query="AI", search_type="Latest", limit=5)` | Lookup thiếu topic=news dù user yêu cầu tin tức; routing đúng nhưng arguments sai. | Đề xuất mô tả rõ topic=news cho tin tức trong tools.yaml; chưa kiểm chứng riêng. |
+| R12_confirm_before_send (v2) | wrong_boundary | `clarify(response_type="text")` | Model hỏi nội dung bản tin; evaluator yêu cầu response_type=yes_no. Chưa có hành động gửi. | V3 phân biệt text/yes_no trong description của clarify, nhưng lỗi vẫn còn. Cần review thủ công vì nội dung gửi chưa được cung cấp nên hỏi bổ sung cũng có cơ sở. |
+| R11_missing_url (v3) | missing_info | `fetch(url="https://example.com")` | Tái xuất hiện việc tạo URL giả thay vì clarify. | Đề xuất giữ rule cấm URL giả và kiểm tra lại sự tương tác với description mới; chưa kiểm chứng nguyên nhân tái lỗi. |
+| R12_confirm_before_send (v3) | wrong_boundary | `clarify(response_type="text")` | Vẫn hỏi nội dung thay vì xác nhận yes/no theo expected; thay đổi description chưa giải quyết lỗi chấm này. | Đề xuất bỏ chỉ dẫn gửi ngay và review tiêu chí hỏi nội dung/xác nhận khi user chưa cung cấp bản tin; chưa chạy vòng kiểm chứng mới. |
+| R13_parallel_web_and_tweets (v3) | wrong_tool | `lookup(query="AI", timeframe="day", max_results=5)`; `social_search(query="AI", limit=5)` | Lookup tiếp tục thiếu topic=news; không phải thiếu tool. | Đề xuất sửa riêng description/parameter topic của lookup ở vòng tiếp theo và đo lại; chưa kiểm chứng. |
 
 ### B3. Team Eval Cases
 

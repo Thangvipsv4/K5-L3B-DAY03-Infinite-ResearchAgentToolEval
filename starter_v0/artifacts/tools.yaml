@@ -16,7 +16,14 @@
 tools:
   # ---------------- Core tools ----------------
   - name: clarify
-    description: "Gửi một câu hỏi cho người dùng."
+    description: >-
+      Hỏi người dùng và chờ phản hồi trước khi tiếp tục. Dùng response_type=text
+      khi cần bổ sung thông tin như tài khoản hoặc URL; dùng response_type=yes_no
+      khi cần xác nhận cho hành động gửi, đăng hoặc xuất bản. Yêu cầu gửi/đăng
+      chưa phải là xác nhận: phải hỏi xác nhận trước khi gọi send, không tự đặt
+      confirmed=true. Nếu nội dung gửi còn thiếu, nêu rõ trong câu hỏi xác nhận
+      rằng người dùng cần cung cấp và duyệt nội dung cụ thể; chưa thực hiện gửi.
+      Không dùng khi đã có đủ thông tin và không cần xác nhận hành động.
     parameters:
       type: object
       properties:

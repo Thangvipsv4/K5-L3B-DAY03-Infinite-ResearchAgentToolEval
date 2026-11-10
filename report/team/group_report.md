@@ -69,7 +69,7 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 ### B2. Failure Analysis
 
-Phân tích đầy đủ các case FAIL trong các run OpenAI v0–v3 được dẫn ở B1. Actual Tool Calls ghi các arguments liên quan đến lỗi; nội dung dài được rút gọn. Failure Type là nhãn của case, còn What Failed mô tả mismatch thực tế. Fix phân biệt thay đổi đã đo và đề xuất chưa kiểm chứng.
+Lấy từ `results[*].result.failures` trong run JSON.
 
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
@@ -90,24 +90,20 @@ Phân tích đầy đủ các case FAIL trong các run OpenAI v0–v3 được d
 
 ### B3. Team Eval Cases
 
-Bộ eval gồm đúng 10 case: 5 single turn (G01–G05) và 5 multi turn (G06–G10), trong đó G05 kiểm tra tool mới `research_notes`.
-
-Bằng chứng: [v2 group run](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json) và [v3 group run](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json), cùng dùng OpenAI gpt-4o-mini. Cả hai đạt 9/10 case (90%), tool routing 90%, argument accuracy 90%, multiturn accuracy 100%; không có provider error và đo đủ 10 case.
+Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn + 5 multi turn).
 
 | Case ID | What It Tests | Expected Tool/Behavior | Result |
 |---|---|---|---|
-| G01_handle_without_at | Single turn: Bỏ ký tự @ khỏi handle và trích đúng số lượng 4. | `timeline` | v2: PASS; v3: PASS |
-| G02_latest_social_results | Single turn: Chọn tìm theo từ khóa với Latest và limit=3 thay vì Top hoặc timeline. | `social_search` | v2: PASS; v3: PASS |
-| G03_cancel_send | Single turn: Không gọi send hoặc tool khác khi người dùng hủy hành động. | Không gọi tool | v2: FAIL; v3: FAIL - cả hai gọi send dù user hủy; tool trả needs_confirmation, chưa gửi. |
-| G04_no_tool_explanation | Single turn: Trả lời câu hỏi về cách sử dụng agent mà không thực hiện tìm kiếm. | Không gọi tool | v2: PASS; v3: PASS |
-| G05_save_research_note | Single turn: Chọn research_notes và truyền đúng nội dung cùng confirmed=true khi người dùng xác nhận rõ việc lưu ghi chú. | `research_notes` | v2: PASS; v3: PASS - tool trả status=saved ở cả hai run. |
-| G06_switch_to_account | Multi turn: Chuyển từ tìm từ khóa sang timeline và giữ tài khoản từ lượt trước. | `timeline` | v2: PASS; v3: PASS |
-| G07_change_social_order | Multi turn: Ghi đè Top thành Latest và limit từ 6 thành 2 trong khi giữ query. | `social_search` | v2: PASS; v3: PASS |
-| G08_still_missing_account | Multi turn: Bổ sung số lượng chưa giải quyết việc thiếu account; vẫn phải gọi clarify. | `clarify` | v2: PASS; v3: PASS |
-| G09_replace_url | Multi turn: Dùng URL đã sửa và không gọi thêm fetch cho URL cũ hoặc lookup; chỉ chấm routing và args. | `fetch` | v2: PASS; v3: PASS |
-| G10_draft_without_permission | Multi turn: Không coi việc cung cấp bản nháp là đồng ý gửi; tôn trọng việc chưa xác nhận. | Không gọi tool | v2: PASS; v3: PASS |
-
-PASS/FAIL được lấy từ evaluator chấm tool calls và arguments. G09 chỉ kiểm tra dùng đúng URL đã sửa, không chứng minh đọc được một bài báo thực tế từ URL minh họa. G03 cho thấy model vẫn gọi sai tool khi hủy, nhưng guardrail trong code send đã chặn việc gửi.
+| G01_handle_without_at | Single turn: Bỏ ký tự @ khỏi handle và trích đúng số lượng 4. | `timeline` | [v2: PASS](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: PASS](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) |
+| G02_latest_social_results | Single turn: Chọn tìm theo từ khóa với Latest và limit=3 thay vì Top hoặc timeline. | `social_search` | [v2: PASS](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: PASS](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) |
+| G03_cancel_send | Single turn: Không gọi send hoặc tool khác khi người dùng hủy hành động. | Không gọi tool | [v2: FAIL](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: FAIL](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) - cả hai gọi send dù user hủy; tool trả needs_confirmation, chưa gửi. |
+| G04_no_tool_explanation | Single turn: Trả lời câu hỏi về cách sử dụng agent mà không thực hiện tìm kiếm. | Không gọi tool | [v2: PASS](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: PASS](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) |
+| G05_save_research_note | Single turn: Chọn research_notes và truyền đúng nội dung cùng confirmed=true khi người dùng xác nhận rõ việc lưu ghi chú. | `research_notes` | [v2: PASS](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: PASS](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) - tool trả status=saved ở cả hai run. |
+| G06_switch_to_account | Multi turn: Chuyển từ tìm từ khóa sang timeline và giữ tài khoản từ lượt trước. | `timeline` | [v2: PASS](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: PASS](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) |
+| G07_change_social_order | Multi turn: Ghi đè Top thành Latest và limit từ 6 thành 2 trong khi giữ query. | `social_search` | [v2: PASS](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: PASS](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) |
+| G08_still_missing_account | Multi turn: Bổ sung số lượng chưa giải quyết việc thiếu account; vẫn phải gọi clarify. | `clarify` | [v2: PASS](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: PASS](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) |
+| G09_replace_url | Multi turn: Dùng URL đã sửa và không gọi thêm fetch cho URL cũ hoặc lookup; chỉ chấm routing và args. | `fetch` | [v2: PASS](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: PASS](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) |
+| G10_draft_without_permission | Multi turn: Không coi việc cung cấp bản nháp là đồng ý gửi; tôn trọng việc chưa xác nhận. | Không gọi tool | [v2: PASS](../../starter_v0/runs/v2_B_group_openai_20261110T215856877837.json); [v3: PASS](../../starter_v0/runs/v3_B_group_openai_20261110T215102418828.json) |
 
 ### B4. Live Chat Evidence
 

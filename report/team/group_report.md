@@ -10,21 +10,20 @@
 
 - Tên nhóm: Infinite
 - Thành viên và phân công: xem [TEAM.md](../../TEAM.md)
-- Provider/model dùng cho v0–v3:
+- Provider/model dùng cho v0–v3: OpenAI
 
 ## 2. Mục tiêu và cách tiếp cận — PHẦN A: Giới thiệu agent
 
 ### A1. Agent này làm được gì
 
-> 1–2 câu mô tả agent dùng để làm gì (cho team khác hiểu nhanh).
-
-Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc URL, tổng hợp thành digest, và gửi lên Telegram khi được xác nhận."
+Research Agent hỗ trợ tìm kiếm thông tin trên web và mạng xã hội, đọc URL, tra cứu bài báo khoa học và chính sách nội bộ, trình bày kết quả thành digest, và lưu ghi chú nghiên cứu vào file local khi người dùng xác nhận. Agent có thể hỏi lại khi thiếu thông tin; các lượt chạy live cũng cho thấy giới hạn khi nguồn chặn truy cập hoặc thiếu cấu hình dịch vụ gửi.
 
 **Cách chạy UI:**
 
-> Lệnh chạy UI (ví dụ `streamlit run app.py`) và dependency đã thêm vào `starter_v0/requirements.txt`.
+Từ thư mục `starter_v0/`, cài dependency bằng `pip install -r requirements.txt`, cấu hình provider trong `.env` theo [hướng dẫn setup](../../docs/TOOL-SETUP.md), rồi chạy `streamlit run app.py`. UI dùng Streamlit; dependency được khai báo trong [requirements.txt](../../starter_v0/requirements.txt).
 
-**Link dùng thử (deploy):** https://quad-seed-prefers-lower.trycloudflare.com 
+**Link dùng thử (deploy):** https://quad-seed-prefers-lower.trycloudflare.com  
+Đây là link tunnel dùng trong phiên live chat; tunnel tạm thời có thể không còn hoạt động sau phiên thử.
 
 
 ### A2. Tool agent có
@@ -33,23 +32,34 @@ Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc 
 
 | Tên tool | Làm được gì | Tool mới nhóm thêm? |
 |---|---|---|
-| clarify | hỏi lại người dùng khi thiếu thông tin | không |
-|  |  |  |
-|  |  |  |
+| `clarify` | Hỏi người dùng để bổ sung thông tin hoặc xác nhận hành động. | không |
+| `timeline` | Lấy bài đăng gần đây theo tài khoản. | không |
+| `social_search` | Tìm bài đăng trên mạng xã hội theo từ khóa. | không |
+| `lookup` | Tìm thông tin trên web, gồm tìm kiếm tin tức theo khoảng thời gian. | không |
+| `fetch` | Đọc nội dung từ URL do người dùng cung cấp. | không |
+| `format` | Trình bày các kết quả đã có theo mẫu digest. | không |
+| `send` | Gửi nội dung qua Telegram; cần xác nhận trước khi gửi. | không |
+| `policy` | Tìm trong tài liệu chính sách nội bộ. | không |
+| `papers` | Tìm bài báo khoa học trên arXiv. | không |
+| `paper_text` | Lấy nội dung văn bản của bài báo arXiv. | không |
+| `research_notes` | Lưu ghi chú nghiên cứu vào JSON local sau khi xác nhận. | có |
 
 ### A3. Câu hỏi mẫu để thử
 
-> 3–5 câu hỏi/yêu cầu mẫu để team khác tự thử agent ngay.
+3–5 câu hỏi/yêu cầu mẫu để team khác tự thử agent:
 
-1.
-2.
-3.
+1. `Tìm các nghiên cứu gần đây về tác động của AI đến thói quen làm việc và tư duy.`
+2. `Phân tích trang này giúp tôi.` (Agent cần hỏi URL trước khi đọc.)
+3. `Lấy 4 bài đăng mới nhất của tài khoản @NASA trên Twitter.`
+4. `Lưu ghi chú nghiên cứu có tiêu đề "Tool evaluation" với nội dung "Eval kiểm tra lựa chọn tool và arguments."`
+5. `Đăng bản tin sau lên Telegram: [nội dung].` (Kiểm tra hỏi xác nhận trước khi gửi; cần cấu hình Telegram.)
 
 ## 3. Giải pháp
 
-> Tóm tắt các thay đổi chính trong `starter_v0/artifacts/system_prompt.md` và `starter_v0/artifacts/tools.yaml`, và tool mới nhóm viết (tên, làm gì, khi nào agent nên gọi).
+v1 loại bỏ chỉ dẫn cho phép tự đoán account/URL; v2 yêu cầu dùng `clarify` khi thiếu thông tin và không tạo giá trị thay thế. Ở v3, nhóm thử làm rõ cách chọn `response_type=text` và `yes_no` trong description của `clarify`; kết quả giảm từ 95% xuống 85% case accuracy nên không xem thay đổi này là cải thiện tổng thể.
 
--
+- Tool mới là [`research_notes`](../../starter_v0/tools/research_notes/TOOL.md): chỉ dùng khi người dùng yêu cầu lưu ghi chú nghiên cứu; yêu cầu `confirmed=true`, kiểm tra title/content và trả error dict nếu input hoặc thao tác file lỗi.
+- Các thay đổi và giới hạn của prompt/tool declaration được phân tích thêm tại mục B1 và B6. Bằng chứng đo được là các run có liên kết ở B1; không suy luận rằng một thay đổi đơn lẻ chắc chắn gây ra mọi biến động điểm.
 
 ## 4. Kết quả — PHẦN B: Chi tiết và bằng chứng
 

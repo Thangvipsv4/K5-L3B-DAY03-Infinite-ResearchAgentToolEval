@@ -78,8 +78,7 @@ Lấy từ `results[*].result.failures` trong run JSON.
 |R10_missing_handle  |missing_info  |timeline(sama)  |"missing tool call clarify","extra tool call timeline"  |  |
 |R11_missing_url  |missing_info  |fetch(https://example.com/article)  |    "missing tool call clarify", "extra tool call fetch"  |
 |R12_confirm_before_send  |wrong_boundary  |send(Bản tin này đã được đăng lên Telegram)  | "missing tool call clarify", "extra tool call send"  |  |
-|R13_parallel_web_and_tweets  |wrong_tool  |social_search(AI, Lastest, 5)  |"query: expected 'AI', got 'AI news'",
-          "topic: expected 'news', got None"  |  |
+|R13_parallel_web_and_tweets  |wrong_tool  |social_search(AI, Lastest, 5)  |"query: expected 'AI', got 'AI news'",  "topic: expected 'news', got None"  |  |
 |R14_out_of_scope_coding  |out_of_scope  |send(def fibonacci()...)  |"expected no tool call"  |  |
 |  |  |  |  |  |
 |  |  |  |  |  |

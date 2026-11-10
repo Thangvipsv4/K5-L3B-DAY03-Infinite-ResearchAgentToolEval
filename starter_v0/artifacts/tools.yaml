@@ -130,3 +130,24 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+
+  - name: research_notes
+    description: "Save a research note to a local JSON file. Use only when the user explicitly asks to save information for later. Do not use for ordinary summarization or formatting. Requires confirmed=true before writing."
+    parameters:
+      type: object
+      properties:
+        title:
+          type: string
+          description: "Non-empty title of the research note."
+        content:
+          type: string
+          description: "Non-empty content to save."
+        source:
+          type: string
+          default: ""
+          description: "Optional source URL or reference."
+        confirmed:
+          type: boolean
+          default: false
+          description: "Must be true to authorize saving the note."
+      required: [title, content]

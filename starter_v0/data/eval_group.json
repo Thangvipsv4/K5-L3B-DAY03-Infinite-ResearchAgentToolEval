@@ -70,20 +70,24 @@
     }
   },
   {
-    "id": "G05_new_team_tool",
+    "id": "G05_save_research_note",
     "phase": "B",
-    "query": "THAY BẰNG YÊU CẦU CỤ THỂ CẦN TOOL MỚI CỦA NHÓM",
+    "query": "Tôi xác nhận lưu ngay ghi chú nghiên cứu sau vào file local: title là 'Tool evaluation', content là 'Eval kiểm tra lựa chọn tool và arguments.', source để trống. Giữ nguyên nội dung này.",
     "failure_type": "wrong_tool",
     "expect": {
       "tool_calls": [
         {
-          "name": "TEN_TOOL_MOI",
-          "args": {}
+          "name": "research_notes",
+          "args": {
+            "title": "Tool evaluation",
+            "content": "Eval kiểm tra lựa chọn tool và arguments.",
+            "confirmed": true
+          }
         }
       ]
     },
     "metadata": {
-      "what_it_tests": "Kiểm tra model chọn tool mới của nhóm; cần điền tên tool và arguments thực tế trước khi chạy."
+      "what_it_tests": "Chọn research_notes và truyền đúng nội dung cùng confirmed=true khi người dùng xác nhận rõ việc lưu ghi chú."
     }
   },
   {

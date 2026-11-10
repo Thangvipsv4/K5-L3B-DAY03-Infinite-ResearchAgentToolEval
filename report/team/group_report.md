@@ -182,7 +182,7 @@ Lỗi đặc thù của model nhỏ (đếm từ run JSON):
 
 > Khó khăn chính và cách nhóm xử lý. Nếu gặp lỗi kỹ thuật (provider lỗi, hết quota API, tool không chạy), mô tả lỗi và dẫn bằng chứng: run JSON, log, ảnh chụp.
 
--
+Việc sửa description của clarify ở v3 chưa giải quyết được lỗi chọn kiểu hỏi text/yes_no và kết quả còn giảm từ 95% xuống 85% trên bộ base. Nhóm cần xem lại các chỉ dẫn mâu thuẫn giữa system prompt và tool description, sau đó kiểm chứng cách sửa ở các version tiếp theo.
 
 ## 6. Tổng hợp đóng góp
 
@@ -191,9 +191,13 @@ Chi tiết đóng góp của từng thành viên nằm trong [TEAM.md](../../TEA
 ## 7. Hạn chế và hướng cải thiện — B6. Reflection
 
 - Fix nào thuộc `system_prompt.md`?
+  Bỏ việc đoán account/URL và yêu cầu gọi clarify khi thiếu thông tin.
 - Fix nào thuộc `tools.yaml`?
+  Làm rõ description của clarify, phân biệt hỏi bổ sung bằng text và xác nhận bằng yes_no; v3 chưa cải thiện kết quả tổng thể.
 - Failure nào cần review thủ công thay vì chấm tự động?
+  Case R12 hỏi nội dung bản tin bằng text bị chấm sai vì expected là yes_no, nhưng hỏi bổ sung có cơ sở khi chưa có nội dung. Chất lượng nguồn và việc tool thực thi thành công cũng cần kiểm tra ngoài điểm routing/arguments.
 - Nếu có thêm một vòng, nhóm sẽ thử giả thuyết nào?
+  Bỏ chỉ dẫn gửi ngay trong system prompt và yêu cầu xác nhận nội dung trước hành động, kiểm tra liệu lỗi xác nhận và gọi send khi user hủy có giảm không, đồng thời chạy lại base và group eval.
 
 ## 8. Tài liệu tham khảo
 

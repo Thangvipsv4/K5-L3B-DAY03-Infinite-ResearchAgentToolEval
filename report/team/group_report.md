@@ -108,7 +108,16 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 
 | Turn | User Request | Tool Calls | Version Evidence | Outcome |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| [v1 T1](../../starter_v0/transcripts/v1_openai_20261110T195916417164.transcript.json) | “Can you scrape some recent research for me” | Không gọi tool | v1; OpenAI `gpt-4o-mini`; artifact `v1+p6139f40723ba+te69bc53ed884` | Hỏi thêm topic/keywords trước khi tìm kiếm. |
+| [v3 T1](../../starter_v0/transcripts/v3_openrouter_20261110T222436366854.transcript.json) | Tác động của AI đến thói quen làm việc và tư duy đến năm 2026 | `lookup` (topic=general, timeframe=week, max_results=5) | v3; OpenRouter `openai/gpt-4o-mini`; artifact `v3+p1e2a00d00d33+tf75dc423d71d` | Lookup trả 5 kết quả; assistant tổng hợp và dẫn nguồn trong câu trả lời. |
+| [v3 T1](../../starter_v0/transcripts/v3_openrouter_20261110T222905881214.transcript.json) | Nhờ phân tích tương tác và khán giả của “trang này” | Không gọi tool | v3; OpenRouter `openai/gpt-4o-mini`; artifact `v3+p1e2a00d00d33+tf75dc423d71d` | Hỏi URL vì yêu cầu chưa nêu trang cần phân tích. |
+| [v3 T2](../../starter_v0/transcripts/v3_openrouter_20261110T222905881214.transcript.json) | Cung cấp URL trang Facebook | `fetch(url=…)` | v3; OpenRouter `openai/gpt-4o-mini`; artifact `v3+p1e2a00d00d33+tf75dc423d71d` | Fetch lỗi HTTP 403; assistant báo không truy cập được và xin thêm thông tin. |
+| [v3 T3](../../starter_v0/transcripts/v3_openrouter_20261110T222905881214.transcript.json) | Cung cấp “11K người theo dõi • 3 đang theo dõi” | `timeline(screenname=…, limit=5)`; `social_search(query=…, limit=5)` | v3; OpenRouter `openai/gpt-4o-mini`; artifact `v3+p1e2a00d00d33+tf75dc423d71d` | Timeline lỗi JSON; social search trả danh sách rỗng. Assistant nêu không lấy được bài đăng và đưa hướng phân tích chung dựa trên số liệu user cung cấp. |
+| [v3 T1](../../starter_v0/transcripts/v3_openrouter_20261110T223332316291.transcript.json) | Yêu cầu đăng “bản tin này” lên Telegram, chưa có nội dung | Không gọi tool | v3; OpenRouter `openai/gpt-4o-mini`; artifact `v3+p1e2a00d00d33+tf75dc423d71d` | Hỏi user cung cấp nội dung bản tin. |
+| [v3 T2](../../starter_v0/transcripts/v3_openrouter_20261110T223332316291.transcript.json) | Cung cấp nội dung “I love you. I love you 3000.” | `clarify(response_type=yes_no)` | v3; OpenRouter `openai/gpt-4o-mini`; artifact `v3+p1e2a00d00d33+tf75dc423d71d` | Hỏi xác nhận đăng và chuyển trạng thái chờ user. |
+| [v3 T3](../../starter_v0/transcripts/v3_openrouter_20261110T223332316291.transcript.json) | Xác nhận “Có.” | `send(text=…, confirmed=true)` | v3; OpenRouter `openai/gpt-4o-mini`; artifact `v3+p1e2a00d00d33+tf75dc423d71d` | Gửi không thành công: thiếu `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID`; assistant báo lỗi cấu hình. |
+| [v3 T4](../../starter_v0/transcripts/v3_openrouter_20261110T223332316291.transcript.json) | Cung cấp `@my_newsletter` | `send(text=…)` | v3; OpenRouter `openai/gpt-4o-mini`; artifact `v3+p1e2a00d00d33+tf75dc423d71d` | Tool trả `needs_confirmation`; assistant hỏi xác nhận rõ ràng trước khi gửi. |
+| [v3 T5](../../starter_v0/transcripts/v3_openrouter_20261110T223332316291.transcript.json) | Xác nhận “Có.” lần nữa | `send(text=…)` | v3; OpenRouter `openai/gpt-4o-mini`; artifact `v3+p1e2a00d00d33+tf75dc423d71d` | Vẫn `needs_confirmation` vì lần gọi này không truyền `confirmed`; assistant lặp lại câu hỏi, chưa gửi. |
 
 ### B5a. Required Evidence — Tool mới, unit test, UI
 

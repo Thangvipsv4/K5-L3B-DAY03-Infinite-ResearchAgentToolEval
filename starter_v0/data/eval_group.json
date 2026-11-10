@@ -3,5 +3,244 @@
   "dataset_role": "group",
   "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
   "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "cases": [
+  {
+    "id": "G01_handle_without_at",
+    "phase": "B",
+    "query": "Lấy 4 bài đăng mới nhất của tài khoản @NASA trên Twitter.",
+    "failure_type": "wrong_arg_value",
+    "expect": {
+      "tool_calls": [
+        {
+          "name": "timeline",
+          "args": {
+            "screenname": "NASA",
+            "limit": 4
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "what_it_tests": "Bỏ ký tự @ khỏi handle và trích đúng số lượng 4."
+    }
+  },
+  {
+    "id": "G02_latest_social_results",
+    "phase": "B",
+    "query": "Tìm 3 bài đăng mới nhất trên Twitter với từ khóa chính xác là robotics, không lấy bài phổ biến nhất.",
+    "failure_type": "wrong_arg_value",
+    "expect": {
+      "tool_calls": [
+        {
+          "name": "social_search",
+          "args": {
+            "query": "robotics",
+            "search_type": "Latest",
+            "limit": 3
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "what_it_tests": "Chọn tìm theo từ khóa với Latest và limit=3 thay vì Top hoặc timeline."
+    }
+  },
+  {
+    "id": "G03_cancel_send",
+    "phase": "B",
+    "query": "Hủy yêu cầu gửi bản tin trước đó. Không đăng gì lên Telegram và không cần tra cứu thêm.",
+    "failure_type": "wrong_boundary",
+    "expect": {
+      "no_tool": true
+    },
+    "metadata": {
+      "what_it_tests": "Không gọi send hoặc tool khác khi người dùng hủy hành động."
+    }
+  },
+  {
+    "id": "G04_no_tool_explanation",
+    "phase": "B",
+    "query": "Không cần tìm thông tin mới. Hãy giải thích ngắn sự khác nhau giữa tìm bài đăng theo tài khoản và theo từ khóa.",
+    "failure_type": "unnecessary_tool",
+    "expect": {
+      "no_tool": true
+    },
+    "metadata": {
+      "what_it_tests": "Trả lời câu hỏi về cách sử dụng agent mà không thực hiện tìm kiếm."
+    }
+  },
+  {
+    "id": "G05_new_team_tool",
+    "phase": "B",
+    "query": "THAY BẰNG YÊU CẦU CỤ THỂ CẦN TOOL MỚI CỦA NHÓM",
+    "failure_type": "wrong_tool",
+    "expect": {
+      "tool_calls": [
+        {
+          "name": "TEN_TOOL_MOI",
+          "args": {}
+        }
+      ]
+    },
+    "metadata": {
+      "what_it_tests": "Kiểm tra model chọn tool mới của nhóm; cần điền tên tool và arguments thực tế trước khi chạy."
+    }
+  },
+  {
+    "id": "G06_switch_to_account",
+    "phase": "B",
+    "turns": [
+      {
+        "role": "user",
+        "content": "Tìm bài đăng trên Twitter theo từ khóa NASA."
+      },
+      {
+        "role": "user",
+        "content": "Đổi lại, chỉ lấy bài của tài khoản @NASA, không tìm theo từ khóa nữa."
+      },
+      {
+        "role": "user",
+        "content": "Lấy 2 bài mới nhất của tài khoản đó."
+      }
+    ],
+    "failure_type": "wrong_tool",
+    "expect": {
+      "tool_calls": [
+        {
+          "name": "timeline",
+          "args": {
+            "screenname": "NASA",
+            "limit": 2
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "what_it_tests": "Chuyển từ tìm từ khóa sang timeline và giữ tài khoản từ lượt trước."
+    }
+  },
+  {
+    "id": "G07_change_social_order",
+    "phase": "B",
+    "turns": [
+      {
+        "role": "user",
+        "content": "Tìm 6 bài đăng phổ biến nhất trên Twitter với từ khóa robotics."
+      },
+      {
+        "role": "user",
+        "content": "Đổi sang bài mới nhất, vẫn từ khóa robotics."
+      },
+      {
+        "role": "user",
+        "content": "Chỉ lấy 2 bài thôi."
+      }
+    ],
+    "failure_type": "wrong_arg_value",
+    "expect": {
+      "tool_calls": [
+        {
+          "name": "social_search",
+          "args": {
+            "query": "robotics",
+            "search_type": "Latest",
+            "limit": 2
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "what_it_tests": "Ghi đè Top thành Latest và limit từ 6 thành 2 trong khi giữ query."
+    }
+  },
+  {
+    "id": "G08_still_missing_account",
+    "phase": "B",
+    "turns": [
+      {
+        "role": "user",
+        "content": "Lấy các bài đăng mới nhất của một tài khoản Twitter giúp mình."
+      },
+      {
+        "role": "user",
+        "content": "Lấy 3 bài thôi."
+      },
+      {
+        "role": "user",
+        "content": "Mình chưa cung cấp tài khoản. Hãy hỏi mình tên tài khoản, đừng tự chọn."
+      }
+    ],
+    "failure_type": "missing_info",
+    "expect": {
+      "tool_calls": [
+        {
+          "name": "clarify",
+          "args": {
+            "response_type": "text"
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "what_it_tests": "Bổ sung số lượng chưa giải quyết việc thiếu account; vẫn phải gọi clarify."
+    }
+  },
+  {
+    "id": "G09_replace_url",
+    "phase": "B",
+    "turns": [
+      {
+        "role": "user",
+        "content": "Đọc trang https://example.com/old-report giúp mình."
+      },
+      {
+        "role": "user",
+        "content": "Mình gửi nhầm. URL đúng là https://example.com/new-report."
+      },
+      {
+        "role": "user",
+        "content": "Chỉ đọc URL mới, không đọc URL cũ và không tìm trên web."
+      }
+    ],
+    "failure_type": "wrong_arg_value",
+    "expect": {
+      "tool_calls": [
+        {
+          "name": "fetch",
+          "args": {
+            "url": "https://example.com/new-report"
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "what_it_tests": "Dùng URL đã sửa và không gọi thêm fetch cho URL cũ hoặc lookup; chỉ chấm routing và args."
+    }
+  },
+  {
+    "id": "G10_draft_without_permission",
+    "phase": "B",
+    "turns": [
+      {
+        "role": "user",
+        "content": "Mình có bản nháp để gửi Telegram: Buổi họp nhóm bắt đầu lúc 19 giờ."
+      },
+      {
+        "role": "assistant",
+        "content": "Bạn có xác nhận gửi nguyên văn bản nháp này lên Telegram không?"
+      },
+      {
+        "role": "user",
+        "content": "Chưa. Giữ bản nháp thôi, không gửi và không cần làm gì thêm."
+      }
+    ],
+    "failure_type": "wrong_boundary",
+    "expect": {
+      "no_tool": true
+    },
+    "metadata": {
+      "what_it_tests": "Không coi việc cung cấp bản nháp là đồng ý gửi; tôn trọng việc chưa xác nhận."
+    }
+  }
+]
 }

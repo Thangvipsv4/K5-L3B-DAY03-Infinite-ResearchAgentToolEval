@@ -62,8 +62,8 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
-| v0 | baseline | Không có  | None | case_accuracy: 65%; tool_routing: 75%; argument: 65%; multiturn: 100%    |runs/v0_B_base_openai_20261110T174059848005  |
-| v1 |  |  |  |  |  |
+| v0 | baseline | Đo hiệu năng ban đầu làm mốc so sánh | N/A | case_accuracy: 70%; tool_routing: 75%; argument: 70%; multiturn: 100% | [v0 run](../../starter_v0/runs/v0_B_base_openai_20261110T191208297808.json) |
+| v1 | system_prompt.md | Loại bỏ chỉ dẫn đoán account và URL sẽ giảm gọi tool sai khi thiếu thông tin | case_accuracy: 70%; tool_routing: 75%; argument: 70%; multiturn: 100% | case_accuracy: 80%; tool_routing: 85%; argument: 80%; multiturn: 100% | [v1 run](../../starter_v0/runs/v1_B_base_openai_20261110T192032611274.json) |
 | v2 |  |  |  |  |  |
 | v3 |  |  |  |  |  |
 
@@ -73,7 +73,23 @@ Lấy từ `results[*].result.failures` trong run JSON.
 
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
+|R03_web_news_routing  |wrong_tool  |lookup(AI news, news, day, 5)  |"query: expected 'AI', got 'AI news'"  |  |
+|R08_out_of_scope  |out_of_scope  |send(Nguyên hàm ...)  |  "expected no tool call" |  |
+|R10_missing_handle  |missing_info  |timeline(sama)  |"missing tool call clarify","extra tool call timeline"  |  |
+|R11_missing_url  |missing_info  |fetch(https://example.com/article)  |    "missing tool call clarify", "extra tool call fetch"  |
+|R12_confirm_before_send  |wrong_boundary  |send(Bản tin này đã được đăng lên Telegram)  | "missing tool call clarify", "extra tool call send"  |  |
+|R13_parallel_web_and_tweets  |wrong_tool  |social_search(AI, Lastest, 5)  |"query: expected 'AI', got 'AI news'",
+          "topic: expected 'news', got None"  |  |
+|R14_out_of_scope_coding  |out_of_scope  |send(def fibonacci()...)  |"expected no tool call"  |  |
 |  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+
+
+
 
 ### B3. Team Eval Cases
 

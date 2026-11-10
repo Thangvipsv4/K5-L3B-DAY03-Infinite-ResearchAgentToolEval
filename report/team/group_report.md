@@ -73,7 +73,23 @@ Lấy từ `results[*].result.failures` trong run JSON.
 
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
+|R03_web_news_routing  |wrong_tool  |lookup(AI news, news, day, 5)  |"query: expected 'AI', got 'AI news'"  |  |
+|R08_out_of_scope  |out_of_scope  |send(Nguyên hàm ...)  |  "expected no tool call" |  |
+|R10_missing_handle  |missing_info  |timeline(sama)  |"missing tool call clarify","extra tool call timeline"  |  |
+|R11_missing_url  |missing_info  |fetch(https://example.com/article)  |    "missing tool call clarify", "extra tool call fetch"  |
+|R12_confirm_before_send  |wrong_boundary  |send(Bản tin này đã được đăng lên Telegram)  | "missing tool call clarify", "extra tool call send"  |  |
+|R13_parallel_web_and_tweets  |wrong_tool  |social_search(AI, Lastest, 5)  |"query: expected 'AI', got 'AI news'",
+          "topic: expected 'news', got None"  |  |
+|R14_out_of_scope_coding  |out_of_scope  |send(def fibonacci()...)  |"expected no tool call"  |  |
 |  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+
+
+
 
 ### B3. Team Eval Cases
 
